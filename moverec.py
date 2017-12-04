@@ -13,7 +13,7 @@ Created on Mon Dec 4, 2017
 video_resolution = (640,480) # (x,y)
 buffer_size = 60
 record_min_n_frames = 50
-mov_det_size = (40,30) # (x,y)
+mov_det_size = (160,120) # (x,y)
 motion_compare_past = 5
 save_location = "/data/moverecdata"
 
@@ -33,13 +33,16 @@ parser = argparse.ArgumentParser( \
         " where movement is detected. " + \
         "(written by Pieter Goltstein - December 2017)")
 
-parser.add_argument('-t','--threshold', type=int, default=100,
-                    help= 'Threshold for motion detection (default=100)')
+parser.add_argument('-t','--threshold', type=int, default=10,
+                    help= 'Threshold for motion detection (default=10)')
 parser.add_argument('-v', '--verbose', action="store_true",
-    help='Displays motion quantification (on/off default=off)')
+    help='Prints motion quantification in terminal (on/off default=off)')
+parser.add_argument('-d', '--difference', action="store_true",
+    help='Displays pixelwise difference on screen (on/off default=off)')
 args = parser.parse_args()
 movement_threshold = args.threshold * (mov_det_size[0]*mov_det_size[1])
-display_motion = args.verbose
+print_motion = args.verbose
+display_difference = args.verbose
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Detect operating system
@@ -94,14 +97,14 @@ while True:
     frame_buffer[:,:,:,current_ix] = frame
 
     # Convert to BG for movement detection
-    frame_bg = cv2.resize( cv2.cvtColor( \
-        frame, cv2.COLOR_BGR2GRAY),mov_det_size)
-    prev_frame_bg = cv2.resize( cv2.cvtColor( \
-        frame_buffer[:,:,:,prev_ix], cv2.COLOR_BGR2GRAY),mov_det_size)
+    frame_bg = cv2.resize( cv2.cvtColor( frame,
+        cv2.COLOR_BGR2GRAY),mov_det_size).astype(np.float)
+    prev_frame_bg = cv2.resize( cv2.cvtColor( frame_buffer[:,:,:,prev_ix],
+        cv2.COLOR_BGR2GRAY),mov_det_size).astype(np.float)
 
     # Check whether there was movement
     mv_sum = np.sum(np.abs(prev_frame_bg-frame_bg))
-    if display_motion and frame_counter>buffer_size:
+    if print_motion and frame_counter>buffer_size:
         print("Motion parameter = {}".format( mv_sum \
             /(mov_det_size[0]*mov_det_size[1])))
     if mv_sum > movement_threshold and frame_counter>buffer_size:
@@ -152,9 +155,15 @@ while True:
         saving = False
 
     # Show on screen
-    cv2.putText(frame, date_time[current_ix], bottomLeftCornerOfText,
-        font, fontScale, fontColor, lineThickness)
-    cv2.imshow('Preview',frame)
+    if display_difference:
+        diff_im = (np.abs(prev_frame_bg-frame_bg)).astype(np.uint8)
+        cv2.putText(diff_im, date_time[current_ix], bottomLeftCornerOfText,
+            font, fontScale, fontColor, lineThickness)
+        cv2.imshow('Preview',diff_im)
+    else:
+        cv2.putText(frame, date_time[current_ix], bottomLeftCornerOfText,
+            font, fontScale, fontColor, lineThickness)
+        cv2.imshow('Preview',frame)
 
     # Update buffer pointers
     current_ix += 1
