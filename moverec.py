@@ -14,7 +14,7 @@ video_resolution = (640,480) # (x,y)
 buffer_size = 60
 record_min_n_frames = 50
 mov_det_size = (160,120) # (x,y)
-motion_compare_past = 5
+motion_compare_past = 10
 save_location = "/data/moverecdata"
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -42,7 +42,7 @@ parser.add_argument('-d', '--difference', action="store_true",
 args = parser.parse_args()
 movement_threshold = args.threshold * (mov_det_size[0]*mov_det_size[1])
 print_motion = args.verbose
-display_difference = args.verbose
+display_difference = args.difference
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Detect operating system
