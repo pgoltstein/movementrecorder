@@ -15,7 +15,8 @@ buffer_size = 60
 record_min_n_frames = 50
 mov_det_size = (160,120) # (x,y)
 motion_compare_past = 10
-save_location = "/data/moverecdata"
+# save_location = "/data/moverecdata"
+save_location = "C:/Users/goltstein/OneDrive/moverecs"
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Imports
@@ -33,8 +34,8 @@ parser = argparse.ArgumentParser( \
         " where movement is detected. " + \
         "(written by Pieter Goltstein - December 2017)")
 
-parser.add_argument('-t','--threshold', type=int, default=10,
-                    help= 'Threshold for motion detection (default=10)')
+parser.add_argument('-t','--threshold', type=int, default=3,
+                    help= 'Threshold for motion detection (default=3)')
 parser.add_argument('-v', '--verbose', action="store_true",
     help='Prints motion quantification in terminal (on/off default=off)')
 parser.add_argument('-d', '--difference', action="store_true",
