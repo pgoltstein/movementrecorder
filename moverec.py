@@ -13,8 +13,8 @@ Created on Mon Dec 4, 2017
 video_resolution = (640,480) # (x,y)
 buffer_size = 60
 record_min_n_frames = 50
-mov_det_size = (100,100) # (x,y)
-motion_compare_past = 10
+mov_det_size = (40,30) # (x,y)
+motion_compare_past = 5
 save_location = "/data/moverecdata"
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -101,7 +101,7 @@ while True:
 
     # Check whether there was movement
     mv_sum = np.sum(np.abs(prev_frame_bg-frame_bg))
-    if display_motion:
+    if display_motion and frame_counter>buffer_size:
         print("Motion parameter = {}".format( mv_sum \
             /(mov_det_size[0]*mov_det_size[1])))
     if mv_sum > movement_threshold and frame_counter>buffer_size:
