@@ -14,7 +14,6 @@ video_resolution = (640,480) # (x,y)
 buffer_size = 60
 record_min_n_frames = 50
 mov_det_size = (100,100) # (x,y)
-movement_threshold = 110 * (mov_det_size[0]*mov_det_size[1])
 motion_compare_past = 10
 save_location = "/data/moverecdata"
 
@@ -24,6 +23,23 @@ import cv2
 import numpy as np
 import sys, os, time, datetime
 from sys import platform as _platform
+import argparse
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Arguments
+parser = argparse.ArgumentParser( \
+    description = \
+        "Runs a webcam continuously, and records only snippets of video" + \
+        " where movement is detected. " + \
+        "(written by Pieter Goltstein - December 2017)")
+
+parser.add_argument('-t','--threshold', type=int, default=100,
+                    help= 'Threshold for motion detection (default=100)')
+parser.add_argument('-v', '--verbose', action="store_true",
+    help='Displays motion quantification (on/off default=off)')
+args = parser.parse_args()
+movement_threshold = args.threshold * (mov_det_size[0]*mov_det_size[1])
+display_motion = args.verbose
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Detect operating system
@@ -85,8 +101,9 @@ while True:
 
     # Check whether there was movement
     mv_sum = np.sum(np.abs(prev_frame_bg-frame_bg))
-    print("Motion parameter = {}".format( mv_sum \
-        /(mov_det_size[0]*mov_det_size[1])))
+    if display_motion:
+        print("Motion parameter = {}".format( mv_sum \
+            /(mov_det_size[0]*mov_det_size[1])))
     if mv_sum > movement_threshold and frame_counter>buffer_size:
         save_img = buffer_size+record_min_n_frames
 
