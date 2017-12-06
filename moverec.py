@@ -40,10 +40,13 @@ parser.add_argument('-v', '--verbose', action="store_true",
     help='Prints motion quantification in terminal (on/off default=off)')
 parser.add_argument('-d', '--difference', action="store_true",
     help='Displays pixelwise difference on screen (on/off default=off)')
+parser.add_argument('-q', '--quiet', action="store_true",
+    help='Runs in quiet mode, no output nor display (on/off default=off)')
 args = parser.parse_args()
 movement_threshold = args.threshold * (mov_det_size[0]*mov_det_size[1])
 print_motion = args.verbose
 display_difference = args.difference
+no_output = args.quiet
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Detect operating system
@@ -62,8 +65,9 @@ cap.set(cv2.CAP_PROP_FRAME_HEIGHT, video_resolution[1])
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Initialize window and buffer
-cv2.imshow('Preview',np.zeros( (video_resolution[0],
-                                video_resolution[1]), dtype=int ))
+if not no_output:
+    cv2.imshow('Preview',np.zeros( (video_resolution[0],
+                                    video_resolution[1]), dtype=int ))
 frame_buffer = np.zeros( (video_resolution[1], video_resolution[0], 3,
                     buffer_size), dtype=np.uint8 )
 date_time = ["" for x in range(buffer_size)]
@@ -160,15 +164,16 @@ while True:
         saving = False
 
     # Show on screen
-    if display_difference:
-        diff_im = (np.abs(prev_frame_bg-frame_bg)).astype(np.uint8)
-        cv2.putText(diff_im, date_time[current_ix], bottomLeftCornerOfText,
-            font, fontScale, fontColor, lineThickness)
-        cv2.imshow('Preview',diff_im)
-    else:
-        cv2.putText(frame, date_time[current_ix], bottomLeftCornerOfText,
-            font, fontScale, fontColor, lineThickness)
-        cv2.imshow('Preview',frame)
+    if not no_output:
+        if display_difference:
+            diff_im = (np.abs(prev_frame_bg-frame_bg)).astype(np.uint8)
+            cv2.putText(diff_im, date_time[current_ix], bottomLeftCornerOfText,
+                font, fontScale, fontColor, lineThickness)
+            cv2.imshow('Preview',diff_im)
+        else:
+            cv2.putText(frame, date_time[current_ix], bottomLeftCornerOfText,
+                font, fontScale, fontColor, lineThickness)
+            cv2.imshow('Preview',frame)
 
     # Update buffer pointers
     current_ix += 1
