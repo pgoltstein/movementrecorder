@@ -103,6 +103,10 @@ while True:
     prev_frame_bg = cv2.resize( cv2.cvtColor( frame_buffer[:,:,:,prev_ix],
         cv2.COLOR_BGR2GRAY),mov_det_size).astype(np.float)
 
+    # Normalize by subtracting the mean
+    frame_bg = frame_bg - frame_bg.mean()
+    prev_frame_bg = prev_frame_bg - prev_frame_bg.mean()
+
     # Check whether there was movement
     mv_sum = np.sum(np.abs(prev_frame_bg-frame_bg))
     if print_motion and frame_counter>buffer_size:
